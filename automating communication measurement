@@ -1,0 +1,61 @@
+Automating Communications Measurement
+
+For Dr Nilam
+Automating communications measurement involves more than merely creating a push-button interface to control instruments. 
+An ideal automated system combines data analysis, instrument control, and reporting. For example, such a system might fit a model to measured data, compare model predictions to new measurement data, and summarize the results in a document. Most currently available automated systems are good at one of these tasks but not others—for example, a solution might offer excellent instrument control but poor data analysis abilities.
+
+ demonstrate the automation through two examples. The first shows the combination of instrument control and data analysis in a MATLAB GUI. The second shows automated data analysis and report writing, and demonstrates how to create a standalone executable that can be shared with end users without exposing the underlying code.
+
+
+Combining Instrument Control and Data Analysis
+interfaceObj = visa('AGILENT', VISAaddress)
+% Create a device object.
+fgen = icdevice('agilent_33220a.mdd', interfaceObj)
+% Connect device object to hardware.
+connect(fgen)
+% Set the voltage amplitude to 0.2 V
+set(fgen, 'Amplitude', 0.2)
+
+The application simultaneously receives data from the sound card and the waveform generator and displays it on the graphs. When the user clicks Develop Model, the underlying code analyzes the waveform data and the data from the unknown circuit, fitting a polynomial model to the data and displaying the fitting results as a function of signal frequency. When measurement-taking resumes after the model has been built, the application shows the difference between the measured and modeled data.
+
+Data Analysis and GUI Building
+Our second application continues the theme of GUI control, but this time, we want to automate data analysis and report writing. Our goal is to examine how certain measured Long Term Evolution (LTE) parameters vary over time. Amplifier and transmitter characteristics vary from device to device, but a trend over time may indicate a problem that we need to investigate. We want to display these variations and model changes.
+
+Our source data is a file of measured  parameters 
+
+
+% --- Executes on button press in UpdateGraphs.
+function UpdateGraphs_Callback(hObject, eventdata, handles)
+axes(handles.axes1);
+cla;
+popup_sel_index = get(handles.popupmenu1, 'Value');
+switch popup_sel_index
+case 1
+plot(handles.max_output);
+case 2
+hist(handles.max_output);
+case 3
+plot(handles.min_output);
+case 4
+hist(handles.min_output);
+case 5
+plot(handles.evm);
+case 6
+hist(handles.evm);
+case 7
+plot(handles.receive_sens);
+case 8
+hist(handles.receive_sens);
+case 9
+plot(handles.acs);
+case 10
+hist(handles.acs);
+case 11
+plot(handles.spurious_emi);
+case 12
+hist(handles.spurious_emi);
+end
+
+
+To further automate the process, we add report generation to the GUI. The Report Generator can be called from the MATLAB command line without going through the interface, so we can add a Generate Report button to the GUI and connect it to MATLAB code that generates the report.
+
